@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DateWise - Date-Based To-Do</title>
+    
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- App Loading State -->
+    <div id="app-loading" class="fullscreen-center">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Auth View -->
+    <div id="auth-view" class="hidden fullscreen-center">
+        <div class="auth-box card fade-in">
+            <div class="auth-header">
+                <i class="ri-checkbox-multiple-fill logo-icon-large"></i>
+                <h2>Welcome to DateWise</h2>
+                <p>Manage your daily tasks effectively.</p>
+            </div>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <div class="auth-actions">
+                    <button type="submit" id="btn-login" class="btn btn-primary">Sign In</button>
+                    <button type="button" id="btn-signup" class="btn btn-secondary">Sign Up</button>
+                </div>
+                <div class="auth-links">
+                    <a href="#" id="link-forgot-password">Forgot Password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard-view" class="hidden fade-in">
+        <header class="app-header">
+            <div class="header-left">
+                <i class="ri-checkbox-multiple-fill logo-icon"></i>
+                <h1>DateWise</h1>
+            </div>
+            <div class="header-right">
+                <span id="user-email" class="user-email"></span>
+                <button id="btn-theme" class="icon-btn" aria-label="Toggle Theme">
+                    <i class="ri-moon-line"></i>
+                </button>
+                <button id="btn-logout" class="icon-btn" aria-label="Logout">
+                    <i class="ri-logout-box-r-line"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+            <!-- Horizontal Date Selector -->
+            <section class="date-selector-section">
+                <div class="date-selector-header">
+                    <div class="selected-date-display">
+                        <h2 id="display-date">Select a Date</h2>
+                        <span id="display-date-badge" class="badge hidden">TODAY</span>
+                    </div>
+                    <div class="calendar-wrapper">
+                        <button id="btn-calendar" class="icon-btn btn-surface" aria-label="Select Date from Calendar">
+                            <i class="ri-calendar-line"></i>
+                        </button>
+                        <input type="date" id="calendar-input" class="hidden-calendar-input">
+                    </div>
+                </div>
+                <div class="date-strip-container">
+                    <div id="date-strip" class="date-strip">
+                        <!-- Date items dynamically generated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Card -->
+            <section class="progress-section">
+                <div class="progress-card card">
+                    <div class="progress-header">
+                        <div>
+                            <h3>Daily Progress</h3>
+                            <p id="progress-text">0 of 0 tasks completed</p>
+                        </div>
+                        <div class="progress-percentage">
+                            <span id="progress-percent-text">0%</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task List Section -->
+            <section class="tasks-section">
+                <div id="tasks-loading" class="tasks-state-container hidden">
+                    <div class="spinner small"></div>
+                </div>
+                
+                <div id="tasks-empty" class="tasks-state-container hidden fade-in">
+                    <i class="ri-calendar-check-line empty-icon"></i>
+                    <h3>No tasks for this day</h3>
+                    <p>Your schedule is clear. Enjoy your day or add a new task!</p>
+                </div>
+                
+                <div id="task-list" class="task-list">
+                    <!-- Tasks dynamically generated here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Floating Action Button -->
+        <button id="btn-add-task-fab" class="fab" aria-label="Add Task">
+            <i class="ri-add-line"></i>
+        </button>
+    </div>
+
+    <!-- Add/Edit Task Modal -->
+    <div id="task-modal" class="modal-overlay hidden">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h3 id="modal-title">Add Task</h3>
+                <button class="icon-btn btn-close-modal" aria-label="Close">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                <div class="form-group">
+                    <label for="task-title-input">Task Title</label>
+                    <input type="text" id="task-title-input" required placeholder="What needs to be done?" maxlength="120" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="task-desc-input">Description (Optional)</label>
+                    <textarea id="task-desc-input" rows="3" placeholder="Add some details..." maxlength="500"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-time-input">Time (Optional)</label>
+                        <input type="time" id="task-time-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="task-priority-input">Priority</label>
+                        <select id="task-priority-input">
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-task">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="modal-content card small-modal">
+            <div class="modal-header">
+                <h3>Delete Task?</h3>
+            </div>
+            <div class="modal-body">
+                <p>This task will be permanently deleted. This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="btn-cancel-delete" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="btn-confirm-delete" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Application Script -->
+    <script type="module" src="./script.js"></script>
+</body>
+</html>
